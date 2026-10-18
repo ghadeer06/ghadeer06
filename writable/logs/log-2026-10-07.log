@@ -1,0 +1,45 @@
+CRITICAL - 2026-10-07 07:39:32 --> ErrorException: Undefined variable $tickets
+[Method: GET, Route: admin/tickets/show/6]
+in APPPATH\Views\admin\show.php on line 176.
+ 1 APPPATH\Views\admin\show.php(176): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $tickets', 'C:\\xampp\\htdocs\\ghadeer06\\app\\Views\\admin\\show.php', 176)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\ghadeer06\\app\\Views\\admin\\show.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1268): CodeIgniter\View\View->render('admin/show', [], true)
+ 5 APPPATH\Controllers\Admin.php(56): view('admin/show', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Admin->show('6')
+ 7 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin))
+ 8 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\ghadeer06\\public\\index.php')
+CRITICAL - 2026-10-07 07:39:34 --> ErrorException: Undefined variable $tickets
+[Method: GET, Route: admin/tickets/show/6]
+in APPPATH\Views\admin\show.php on line 176.
+ 1 APPPATH\Views\admin\show.php(176): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $tickets', 'C:\\xampp\\htdocs\\ghadeer06\\app\\Views\\admin\\show.php', 176)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\ghadeer06\\app\\Views\\admin\\show.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1268): CodeIgniter\View\View->render('admin/show', [], true)
+ 5 APPPATH\Controllers\Admin.php(56): view('admin/show', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Admin->show('6')
+ 7 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin))
+ 8 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\ghadeer06\\public\\index.php')
+CRITICAL - 2026-10-07 07:39:39 --> ErrorException: Undefined variable $tickets
+[Method: GET, Route: admin/tickets/show/5]
+in APPPATH\Views\admin\show.php on line 176.
+ 1 APPPATH\Views\admin\show.php(176): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $tickets', 'C:\\xampp\\htdocs\\ghadeer06\\app\\Views\\admin\\show.php', 176)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\ghadeer06\\app\\Views\\admin\\show.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1268): CodeIgniter\View\View->render('admin/show', [], true)
+ 5 APPPATH\Controllers\Admin.php(56): view('admin/show', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Admin->show('5')
+ 7 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin))
+ 8 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\ghadeer06\\public\\index.php')
