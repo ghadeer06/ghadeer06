@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\SimpleXlsx;
 use App\Models\TicketModel;
 
 class Reviewer extends BaseController
@@ -13,41 +14,39 @@ class Reviewer extends BaseController
         $this->ticketModel = new TicketModel();
     }
 
-    // يتأكد إن التبويب من القيم المسموحة
     protected function normalizeTab($tab): string
     {
         return in_array($tab, ['pending', 'approved', 'rejected'], true) ? $tab : 'pending';
     }
 
-    // يجيب بلاغات التبويب (نفس الاستعلام للعرض وللتصدير)
-    protected function ticketsByTab(string $tab): array
+    // فلاتر المدقق: بحث + قسم + أولوية (الحالة يحددها التبويب)
+    protected function currentFilters(): array
     {
-        $query = $this->ticketModel
+        $filters           = TicketModel::cleanFilters($this->request->getGet());
+        $filters['status'] = '';
+
+        return $filters;
+    }
+
+    // نفس الاستعلام للعرض وللتصدير
+    protected function ticketsQuery(string $tab, array $filters): TicketModel
+    {
+        $this->ticketModel
             ->select('tickets.*, users.name as employee_name')
             ->join('users', 'users.id = tickets.created_by')
-            ->where('tickets.review_status', $tab);
+            ->where('tickets.review_status', $tab)
+            ->applyFilters($filters);
 
         if ($tab === 'pending') {
             // الأعلى أولوية أول، وداخل كل أولوية الأقدم أول
-            $query->orderBy("FIELD(tickets.priority, 'high', 'medium', 'low')", '', false)
-                  ->orderBy('tickets.created_at', 'ASC');
+            $this->ticketModel
+                ->orderBy("FIELD(tickets.priority, 'high', 'medium', 'low')", '', false)
+                ->orderBy('tickets.created_at', 'ASC');
         } else {
-            $query->orderBy('tickets.reviewed_at', 'DESC');
+            $this->ticketModel->orderBy('tickets.reviewed_at', 'DESC');
         }
 
-        return $query->findAll();
-    }
-
-    // حماية ملف الإكسل: النص اللي يبدأ برمز صيغة (= + - @) يتحول لنص عادي
-    protected function csvSafe($value): string
-    {
-        $value = (string) $value;
-
-        if ($value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-            return "'" . $value;
-        }
-
-        return $value;
+        return $this->ticketModel;
     }
 
     protected function formatDate($date): string
@@ -55,36 +54,39 @@ class Reviewer extends BaseController
         return $date ? date('Y-m-d H:i', strtotime($date)) : '';
     }
 
-    // قائمة البلاغات حسب التبويب
+    // قائمة البلاغات حسب التبويب والفلاتر (10 بكل صفحة)
     public function index()
     {
-        $tab = $this->normalizeTab($this->request->getGet('tab'));
+        $tab     = $this->normalizeTab($this->request->getGet('tab'));
+        $filters = $this->currentFilters();
 
         $counts = [];
         foreach (['pending', 'approved', 'rejected'] as $status) {
             $counts[$status] = $this->ticketModel->where('review_status', $status)->countAllResults();
         }
 
-        $data = [
-            'tickets' => $this->ticketsByTab($tab),
+        $tickets = $this->ticketsQuery($tab, $filters)->paginate(10);
+
+        return view('reviewer/index', [
+            'tickets' => $tickets,
+            'pager'   => $this->ticketModel->pager,
             'tab'     => $tab,
             'counts'  => $counts,
-        ];
-
-        return view('reviewer/index', $data);
+            'filters' => $filters,
+        ]);
     }
 
-    // تصدير بلاغات التبويب المحدد إلى إكسل (CSV)
+    // تصدير بلاغات التبويب الحالي (بنفس الفلاتر) إلى إكسل
     public function export()
     {
+        if (!SimpleXlsx::isAvailable()) {
+            return redirect()->back()->with('error', 'تصدير إكسل يحتاج تفعيل إضافة zip: افتحي php.ini وفعّلي السطر extension=zip ثم أعيدي تشغيل السيرفر');
+        }
+
         $tab     = $this->normalizeTab($this->request->getGet('tab'));
-        $tickets = $this->ticketsByTab($tab);
+        $filters = $this->currentFilters();
+        $tickets = $this->ticketsQuery($tab, $filters)->findAll();
 
-        $departments    = TicketModel::DEPARTMENTS;
-        $priorityLabels = ['low' => 'منخفضة', 'medium' => 'متوسطة', 'high' => 'عالية'];
-        $statusLabels   = ['open' => 'جديد', 'in_progress' => 'قيد المعالجة', 'resolved' => 'تم الحل'];
-
-        // الأعمدة تختلف حسب التبويب
         $headers = ['رقم البلاغ', 'العنوان', 'القسم', 'الموظف', 'الأولوية', 'تاريخ الإرسال'];
 
         if ($tab === 'approved') {
@@ -95,43 +97,38 @@ class Reviewer extends BaseController
             $headers[] = 'تاريخ التدقيق';
         }
 
-        $output = fopen('php://temp', 'w');
-        fwrite($output, "\xEF\xBB\xBF"); // عشان العربي يطلع صح بإكسل
-
-        fputcsv($output, $headers, ';');
-
+        $rows = [];
         foreach ($tickets as $t) {
             $row = [
-                $t['id'],
-                $this->csvSafe($t['title']),
-                $departments[$t['category']] ?? 'أخرى',
-                $this->csvSafe($t['employee_name']),
-                $priorityLabels[$t['priority']] ?? $t['priority'],
+                (int) $t['id'],
+                $t['title'],
+                TicketModel::DEPARTMENTS[$t['category']] ?? 'أخرى',
+                $t['employee_name'],
+                TicketModel::PRIORITIES[$t['priority']] ?? $t['priority'],
                 $this->formatDate($t['created_at']),
             ];
 
             if ($tab === 'approved') {
-                $row[] = $statusLabels[$t['status']] ?? $t['status'];
+                $row[] = TicketModel::STATUSES[$t['status']] ?? $t['status'];
                 $row[] = $this->formatDate($t['reviewed_at']);
             } elseif ($tab === 'rejected') {
-                $row[] = $this->csvSafe($t['review_note'] ?? '');
+                $row[] = (string) ($t['review_note'] ?? '');
                 $row[] = $this->formatDate($t['reviewed_at']);
             }
 
-            fputcsv($output, $row, ';');
+            $rows[] = $row;
         }
 
-        rewind($output);
-        $csvContent = stream_get_contents($output);
-        fclose($output);
+        $tabNames = ['pending' => 'بانتظار التدقيق', 'approved' => 'المعتمدة', 'rejected' => 'غير المعتمدة'];
 
-        $filename = 'reviewer_' . $tab . '_' . date('Y-m-d') . '.csv';
+        $binary   = SimpleXlsx::build($tabNames[$tab], $headers, $rows);
+        $filename = 'reviewer_' . $tab . '_' . date('Y-m-d') . '.xlsx';
 
-        $response = service('response');
-        $response->setHeader('Content-Type', 'text/csv; charset=UTF-8');
-        $response->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
-
-        return $response->setBody($csvContent);
+        return $this->response
+            ->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->setHeader('Cache-Control', 'no-store')
+            ->setBody($binary);
     }
 
     // قرار المدقق: معتمد أو غير معتمد
@@ -155,10 +152,11 @@ class Reviewer extends BaseController
         $note = trim((string) $this->request->getPost('review_note'));
 
         $this->ticketModel->update($id, [
-            'review_status' => $decision,
-            'review_note'   => ($decision === 'rejected' && $note !== '') ? $note : null,
-            'reviewed_by'   => session()->get('user_id'),
-            'reviewed_at'   => date('Y-m-d H:i:s'),
+            'review_status'    => $decision,
+            'review_note'      => ($decision === 'rejected' && $note !== '') ? $note : null,
+            'reviewed_by'      => session()->get('user_id'),
+            'reviewed_at'      => date('Y-m-d H:i:s'),
+            'has_new_decision' => 1, // إشعار للموظف
         ]);
 
         $message = $decision === 'approved'

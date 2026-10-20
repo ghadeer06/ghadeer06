@@ -21,7 +21,6 @@
             --bg-light: #F6F4F0;
         }
 
-        /* ===== الفوتر الثابت ===== */
         html, body { height: 100%; }
 
         body {
@@ -52,7 +51,6 @@
             align-items: center;
             justify-content: space-between;
         }
-
         .navbar-brand { color: var(--gold) !important; font-weight: 700; }
         .navbar span, .navbar strong { color: #ffffff !important; }
 
@@ -67,7 +65,6 @@
             border-color: #F6F4F0;
             color: #02807A;
         }
-
         .navbar .btn-outline-danger {
             color: #02807A;
             background: #F6F4F0;
@@ -94,11 +91,7 @@
         h4, h5 { color: var(--dark-green); font-weight: 700; }
 
         /* ===== الشارات ===== */
-        .badge {
-            font-weight: 600;
-            padding: 0.45em 0.85em;
-            border-radius: 20px;
-        }
+        .badge { font-weight: 600; padding: 0.45em 0.85em; border-radius: 20px; }
 
         .badge-dept { background: #E3F1F0; color: #02807A; border: 1px solid #9CCFCC; }
 
@@ -150,7 +143,7 @@
             box-shadow: 0 0 0 0.2rem rgba(170,146,109,0.2);
         }
 
-        /* ===== زر الرجوع ===== */
+        /* ===== الأزرار ===== */
         .btn-back {
             display: inline-flex;
             align-items: center;
@@ -172,7 +165,6 @@
             transform: translateX(2px);
         }
 
-        /* ===== زر إرسال الرد ===== */
         .btn-save {
             display: inline-flex;
             align-items: center;
@@ -185,6 +177,7 @@
             background: #02807A;
             border: 1.5px solid #02807A;
             border-radius: 8px;
+            text-decoration: none;
             cursor: pointer;
             transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
         }
@@ -201,10 +194,8 @@
 <body>
 
     <?php
-        $departments    = \App\Models\TicketModel::DEPARTMENTS;
-        $priorityLabels = ['low' => 'منخفضة', 'medium' => 'متوسطة', 'high' => 'عالية'];
-        $statusLabels   = ['open' => 'جديد', 'in_progress' => 'قيد المعالجة', 'resolved' => 'تم الحل'];
-        $isApproved     = $ticket['review_status'] === 'approved';
+        $departments = \App\Models\TicketModel::DEPARTMENTS;
+        $isApproved  = $ticket['review_status'] === 'approved';
     ?>
 
     <nav class="navbar navbar-expand-lg px-4 mb-4">
@@ -239,7 +230,7 @@
                     <div class="d-flex gap-2 flex-wrap">
                         <span class="badge badge-dept"><?= esc($departments[$ticket['category']] ?? 'أخرى') ?></span>
                         <span class="badge badge-priority-<?= $ticket['priority'] ?>">
-                            <?= $priorityLabels[$ticket['priority']] ?? $ticket['priority'] ?>
+                            <?= esc(\App\Models\TicketModel::PRIORITIES[$ticket['priority']] ?? $ticket['priority']) ?>
                         </span>
                         <?php if ($ticket['review_status'] === 'pending') : ?>
                             <span class="badge badge-review-pending">بانتظار التدقيق</span>
@@ -247,7 +238,7 @@
                             <span class="badge badge-review-rejected">غير معتمد</span>
                         <?php else : ?>
                             <span class="badge badge-status-<?= $ticket['status'] ?>">
-                                <?= $statusLabels[$ticket['status']] ?? $ticket['status'] ?>
+                                <?= esc(\App\Models\TicketModel::STATUSES[$ticket['status']] ?? $ticket['status']) ?>
                             </span>
                         <?php endif; ?>
                     </div>
@@ -259,7 +250,10 @@
 
         <?php if ($ticket['review_status'] === 'pending') : ?>
             <div class="review-notice pending">
-                بلاغك الآن <strong>بانتظار التدقيق</strong>. بعد اعتماده يصل للدعم الفني، وتقدر تتابع المحادثة هنا.
+                بلاغك الآن <strong>بانتظار التدقيق</strong>. بعد اعتماده يصل للدعم الفني، وتقدرين تتابعين المحادثة هنا.
+                <?php if ((int) $ticket['resubmit_count'] > 0) : ?>
+                    <br><small>(تم تعديل البلاغ وإعادة إرساله)</small>
+                <?php endif; ?>
             </div>
         <?php elseif ($ticket['review_status'] === 'rejected') : ?>
             <div class="review-notice rejected">
@@ -267,6 +261,10 @@
                 <?php if (!empty($ticket['review_note'])) : ?>
                     <br>السبب: <?= esc($ticket['review_note']) ?>
                 <?php endif; ?>
+                <br>
+                <a href="<?= site_url('tickets/edit/' . $ticket['id']) ?>" class="btn-save mt-2">
+                    تعديل البلاغ وإعادة إرساله
+                </a>
             </div>
         <?php endif; ?>
 

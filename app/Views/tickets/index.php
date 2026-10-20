@@ -21,7 +21,6 @@
             --bg-light: #F6F4F0;
         }
 
-        /* ===== الفوتر الثابت ===== */
         html, body { height: 100%; }
 
         body {
@@ -52,7 +51,6 @@
             align-items: center;
             justify-content: space-between;
         }
-
         .navbar-brand { color: var(--gold) !important; font-weight: 700; }
         .navbar span, .navbar strong { color: #ffffff !important; }
 
@@ -67,7 +65,6 @@
             border-color: #F6F4F0;
             color: #02807A;
         }
-
         .navbar .btn-outline-danger {
             color: #02807A;
             background: #F6F4F0;
@@ -104,7 +101,17 @@
             color: #fff;
         }
 
-        /* ===== زر فتح بلاغ جديد ===== */
+        .btn-edit {
+            color: #B4513F;
+            background: transparent;
+            border-color: #B4513F;
+        }
+        .btn-edit:hover {
+            background: #B4513F;
+            border-color: #B4513F;
+            color: #fff;
+        }
+
         .btn-save {
             display: inline-flex;
             align-items: center;
@@ -128,14 +135,9 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(2,128,122,0.25);
         }
-        .btn-save:active { transform: translateY(0); box-shadow: none; }
 
         /* ===== الشارات ===== */
-        .badge {
-            font-weight: 600;
-            padding: 0.45em 0.85em;
-            border-radius: 20px;
-        }
+        .badge { font-weight: 600; padding: 0.45em 0.85em; border-radius: 20px; }
 
         .badge-priority-low    { background: #E6F3E3; color: #3C7A38; border: 1px solid #9FD297; }
         .badge-priority-medium { background: #F6EBD6; color: #8A6420; border: 1px solid #D9BE86; }
@@ -148,20 +150,21 @@
         .badge-review-pending  { background: #F6EBD6; color: #8A6420; border: 1px solid #D9BE86; }
         .badge-review-rejected { background: #B4513F; color: #fff; }
 
-        .badge-new-reply {
-            background: #B4513F;
+        .badge-new-reply    { background: #B4513F; color: #fff; margin-right: 6px; }
+        .badge-new-decision { background: #309C99; color: #fff; margin-right: 6px; }
+
+        /* ===== تقسيم الصفحات ===== */
+        .pagination .page-link { color: #02807A; border-color: var(--tan); }
+        .pagination .page-link:hover { background: var(--beige); color: #02807A; }
+        .pagination .page-item.active .page-link {
+            background: #02807A;
+            border-color: #02807A;
             color: #fff;
-            margin-right: 6px;
         }
+        .list-footer { color: #7a7367; font-size: 0.88rem; }
     </style>
 </head>
 <body>
-
-    <?php
-        $departments    = \App\Models\TicketModel::DEPARTMENTS;
-        $priorityLabels = ['low' => 'منخفضة', 'medium' => 'متوسطة', 'high' => 'عالية'];
-        $statusLabels   = ['open' => 'جديد', 'in_progress' => 'قيد المعالجة', 'resolved' => 'تم الحل'];
-    ?>
 
     <nav class="navbar navbar-expand-lg px-4 mb-4">
         <span class="navbar-brand fw-bold">نظام البلاغات التقنية</span>
@@ -216,16 +219,19 @@
                                         <td>#<?= $ticket['id'] ?></td>
                                         <td>
                                             <?= esc($ticket['title']) ?>
-                                            <?php if ($ticket['has_new_reply']) : ?>
+                                            <?php if (!empty($ticket['has_new_reply'])) : ?>
                                                 <span class="badge badge-new-reply">رد جديد</span>
                                             <?php endif; ?>
+                                            <?php if (!empty($ticket['has_new_decision'])) : ?>
+                                                <span class="badge badge-new-decision">قرار جديد</span>
+                                            <?php endif; ?>
                                             <div class="dept-line">
-                                                القسم: <?= esc($departments[$ticket['category']] ?? 'أخرى') ?>
+                                                القسم: <?= esc(\App\Models\TicketModel::DEPARTMENTS[$ticket['category']] ?? 'أخرى') ?>
                                             </div>
                                         </td>
                                         <td>
                                             <span class="badge badge-priority-<?= $ticket['priority'] ?>">
-                                                <?= $priorityLabels[$ticket['priority']] ?? $ticket['priority'] ?>
+                                                <?= esc(\App\Models\TicketModel::PRIORITIES[$ticket['priority']] ?? $ticket['priority']) ?>
                                             </span>
                                         </td>
                                         <td>
@@ -235,14 +241,18 @@
                                                 <span class="badge badge-review-rejected">غير معتمد</span>
                                             <?php else : ?>
                                                 <span class="badge badge-status-<?= $ticket['status'] ?>">
-                                                    <?= $statusLabels[$ticket['status']] ?? $ticket['status'] ?>
+                                                    <?= esc(\App\Models\TicketModel::STATUSES[$ticket['status']] ?? $ticket['status']) ?>
                                                 </span>
                                             <?php endif; ?>
                                         </td>
                                         <td><?= date('Y-m-d H:i', strtotime($ticket['created_at'])) ?></td>
-                                        <td>
+                                        <td class="text-nowrap">
                                             <a href="<?= site_url('tickets/show/' . $ticket['id']) ?>"
                                                class="btn btn-sm btn-outline-primary">عرض</a>
+                                            <?php if ($ticket['review_status'] === 'rejected') : ?>
+                                                <a href="<?= site_url('tickets/edit/' . $ticket['id']) ?>"
+                                                   class="btn btn-sm btn-edit">تعديل وإعادة إرسال</a>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -250,6 +260,13 @@
                         </tbody>
                     </table>
                 </div>
+
+                <?php if ($pager->getPageCount() > 1) : ?>
+                    <div class="d-flex flex-column align-items-center gap-2 mt-3">
+                        <?= $pager->links('default', 'custom_full') ?>
+                        <div class="list-footer">إجمالي البلاغات: <?= $pager->getTotal() ?></div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 

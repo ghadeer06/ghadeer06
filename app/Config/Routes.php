@@ -17,6 +17,8 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/tickets/store', 'Tickets::store');
     $routes->get('/tickets/show/(:num)', 'Tickets::show/$1');
     $routes->post('/tickets/reply/(:num)', 'Tickets::reply/$1');
+    $routes->get('/tickets/edit/(:num)', 'Tickets::edit/$1');
+    $routes->post('/tickets/resubmit/(:num)', 'Tickets::resubmit/$1');
 
     $routes->get('/profile', 'Profile::index');
     $routes->post('/profile/update-password', 'Profile::updatePassword');
@@ -32,9 +34,9 @@ $routes->group('reviewer', ['filter' => 'reviewer'], function($routes) {
 // صفحات التقني
 $routes->group('admin', ['filter' => 'admin'], function($routes) {
     $routes->get('tickets', 'Admin::index');
+    $routes->get('tickets/export', 'Admin::export');
     $routes->get('tickets/show/(:num)', 'Admin::show/$1');
     $routes->post('tickets/reply/(:num)', 'Admin::reply/$1');
-    $routes->get('tickets/export', 'Admin::exportCsv');
     $routes->get('tickets/delete/(:num)', 'Admin::delete/$1');
 
     $routes->get('users', 'Users::index');

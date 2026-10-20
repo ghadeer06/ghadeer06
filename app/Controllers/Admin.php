@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\SimpleXlsx;
 use App\Models\TicketModel;
 use App\Models\TicketReplyModel;
 use App\Models\UserModel;
@@ -30,18 +31,47 @@ class Admin extends BaseController
             ->first();
     }
 
-    // كل البلاغات المعتمدة
-    public function index()
+    // نفس الاستعلام للعرض وللتصدير
+    protected function approvedQuery(array $filters): TicketModel
     {
-        $data['tickets'] = $this->ticketModel
+        $this->ticketModel
             ->select('tickets.*, users.name as employee_name')
             ->join('users', 'users.id = tickets.created_by')
             ->where('tickets.review_status', 'approved')
-            ->orderBy("FIELD(tickets.priority, 'high', 'medium', 'low')", '', false)
-            ->orderBy('tickets.created_at', 'DESC')
+            ->applyFilters($filters);
+
+        return $this->ticketModel;
+    }
+
+    // كل البلاغات المعتمدة (15 بكل صفحة) مع البحث والفلترة
+    public function index()
+    {
+        $filters = TicketModel::cleanFilters($this->request->getGet());
+
+        // عدادات المربعات (كل المعتمدة بغض النظر عن الفلاتر)
+        $counts = ['open' => 0, 'in_progress' => 0, 'resolved' => 0];
+
+        $rows = $this->ticketModel
+            ->select('status, COUNT(*) AS total')
+            ->where('review_status', 'approved')
+            ->groupBy('status')
             ->findAll();
 
-        return view('admin/index', $data);
+        foreach ($rows as $row) {
+            $counts[$row['status']] = (int) $row['total'];
+        }
+
+        $tickets = $this->approvedQuery($filters)
+            ->orderBy("FIELD(tickets.priority, 'high', 'medium', 'low')", '', false)
+            ->orderBy('tickets.created_at', 'DESC')
+            ->paginate(15);
+
+        return view('admin/index', [
+            'tickets' => $tickets,
+            'pager'   => $this->ticketModel->pager,
+            'counts'  => $counts,
+            'filters' => $filters,
+        ]);
     }
 
     // تفاصيل بلاغ + المحادثة
@@ -127,47 +157,41 @@ class Admin extends BaseController
         return redirect()->to('/admin/tickets')->with('success', 'تم حذف البلاغ بنجاح');
     }
 
-    // تصدير البلاغات المعتمدة إلى إكسل (CSV)
-    public function exportCsv()
+    // تصدير البلاغات المعتمدة (بنفس الفلاتر المعروضة) إلى إكسل
+    public function export()
     {
-        $tickets = $this->ticketModel
-            ->select('tickets.*, users.name as employee_name')
-            ->join('users', 'users.id = tickets.created_by')
-            ->where('tickets.review_status', 'approved')
+        if (!SimpleXlsx::isAvailable()) {
+            return redirect()->back()->with('error', 'تصدير إكسل يحتاج تفعيل إضافة zip: افتحي php.ini وفعّلي السطر extension=zip ثم أعيدي تشغيل السيرفر');
+        }
+
+        $filters = TicketModel::cleanFilters($this->request->getGet());
+
+        $tickets = $this->approvedQuery($filters)
             ->orderBy('tickets.created_at', 'DESC')
             ->findAll();
 
-        $filename = 'tickets_report_' . date('Y-m-d') . '.csv';
+        $headers = ['رقم البلاغ', 'العنوان', 'القسم', 'الموظف', 'الأولوية', 'الحالة', 'تاريخ الإرسال'];
 
-        $departments    = TicketModel::DEPARTMENTS;
-        $priorityLabels = ['low' => 'منخفضة', 'medium' => 'متوسطة', 'high' => 'عالية'];
-        $statusLabels   = ['open' => 'جديد', 'in_progress' => 'قيد المعالجة', 'resolved' => 'تم الحل'];
-
-        $response = service('response');
-        $response->setHeader('Content-Type', 'text/csv; charset=UTF-8');
-        $response->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
-
-        $output = fopen('php://temp', 'w');
-        fwrite($output, "\xEF\xBB\xBF");
-
-        fputcsv($output, ['رقم البلاغ', 'العنوان', 'القسم', 'الموظف', 'الأولوية', 'الحالة', 'تاريخ الإرسال'], ';');
-
+        $rows = [];
         foreach ($tickets as $t) {
-            fputcsv($output, [
-                $t['id'],
+            $rows[] = [
+                (int) $t['id'],
                 $t['title'],
-                $departments[$t['category']] ?? 'أخرى',
+                TicketModel::DEPARTMENTS[$t['category']] ?? 'أخرى',
                 $t['employee_name'],
-                $priorityLabels[$t['priority']] ?? $t['priority'],
-                $statusLabels[$t['status']] ?? $t['status'],
+                TicketModel::PRIORITIES[$t['priority']] ?? $t['priority'],
+                TicketModel::STATUSES[$t['status']] ?? $t['status'],
                 date('Y-m-d H:i', strtotime($t['created_at'])),
-            ], ';');
+            ];
         }
 
-        rewind($output);
-        $csvContent = stream_get_contents($output);
-        fclose($output);
+        $binary   = SimpleXlsx::build('البلاغات', $headers, $rows);
+        $filename = 'tickets_report_' . date('Y-m-d') . '.xlsx';
 
-        return $response->setBody($csvContent);
+        return $this->response
+            ->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->setHeader('Cache-Control', 'no-store')
+            ->setBody($binary);
     }
 }

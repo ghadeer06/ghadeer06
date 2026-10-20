@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>فتح بلاغ جديد | نظام البلاغات التقنية</title>
+    <title>نموذج البلاغ | نظام البلاغات التقنية</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <style>
@@ -21,7 +21,6 @@
             --bg-light: #F6F4F0;
         }
 
-        /* ===== الفوتر الثابت ===== */
         html, body { height: 100%; }
 
         body {
@@ -52,7 +51,6 @@
             align-items: center;
             justify-content: space-between;
         }
-
         .navbar-brand { color: var(--gold) !important; font-weight: 700; }
         .navbar span, .navbar strong { color: #ffffff !important; }
 
@@ -67,7 +65,6 @@
             border-color: #F6F4F0;
             color: #02807A;
         }
-
         .navbar .btn-outline-danger {
             color: #02807A;
             background: #F6F4F0;
@@ -108,6 +105,16 @@
             box-shadow: 0 0 0 0.2rem rgba(170,146,109,0.2);
         }
         .form-control::placeholder { color: #a9a39a; }
+
+        .prev-reason {
+            background: #FBF1EE;
+            border: 1px solid #E3A99D;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            color: #8A3A2C;
+            margin-bottom: 1.2rem;
+            line-height: 1.8;
+        }
 
         /* ===== زر الرجوع ===== */
         .btn-back {
@@ -172,21 +179,17 @@
             align-items: center;
             transition: border-color 0.2s ease;
         }
-
         .custom-dropdown-selected:hover { border-color: var(--gold); }
-
         .custom-dropdown.active .custom-dropdown-selected {
             border-color: var(--gold);
             box-shadow: 0 0 0 0.2rem rgba(170,146,109,0.2);
         }
-
         .custom-dropdown-selected::after {
             content: "▾";
             color: var(--gold);
             margin-right: 5px;
             transition: transform 0.2s ease;
         }
-
         .custom-dropdown.active .custom-dropdown-selected::after { transform: rotate(180deg); }
 
         .custom-dropdown-options {
@@ -202,7 +205,6 @@
             overflow: hidden;
             z-index: 10;
         }
-
         .custom-dropdown.active .custom-dropdown-options { display: block; }
 
         .custom-dropdown-option {
@@ -212,9 +214,7 @@
             color: var(--dark-green);
             transition: background 0.15s ease;
         }
-
         .custom-dropdown-option:hover { background: var(--cream); }
-
         .custom-dropdown-option.selected {
             background: var(--gold);
             color: #fff;
@@ -225,6 +225,15 @@
 <body>
 
     <?php
+        // وضع التعديل: يوصل $ticket من كنترولر edit
+        $ticket  = $ticket ?? null;
+        $isEdit  = !empty($ticket);
+
+        $formAction = $isEdit ? site_url('tickets/resubmit/' . $ticket['id']) : site_url('tickets/store');
+        $pageTitle  = $isEdit ? 'تعديل البلاغ وإعادة إرساله' : 'فتح بلاغ جديد';
+        $backUrl    = $isEdit ? site_url('tickets/show/' . $ticket['id']) : site_url('tickets');
+        $submitText = $isEdit ? 'إعادة إرسال البلاغ للتدقيق' : 'إرسال البلاغ';
+
         $categories = \App\Models\TicketModel::DEPARTMENTS;
         $priorities = [
             'low'    => 'منخفضة',
@@ -232,11 +241,14 @@
             'high'   => 'عالية (عاجل)',
         ];
 
-        $currentCategory = old('category', 'support');
+        $currentCategory = old('category', $ticket['category'] ?? 'support');
         if (!isset($categories[$currentCategory])) $currentCategory = 'support';
 
-        $currentPriority = old('priority', 'medium');
+        $currentPriority = old('priority', $ticket['priority'] ?? 'medium');
         if (!isset($priorities[$currentPriority])) $currentPriority = 'medium';
+
+        $titleValue = old('title', $ticket['title'] ?? '');
+        $descValue  = old('description', $ticket['description'] ?? '');
     ?>
 
     <nav class="navbar navbar-expand-lg px-4 mb-4">
@@ -251,8 +263,8 @@
     <div class="container page-content">
 
         <div class="d-flex justify-content-between align-items-center mb-4" style="max-width:600px; margin:0 auto;">
-            <h4 class="m-0">فتح بلاغ جديد</h4>
-            <a href="<?= site_url('tickets') ?>" class="btn-back">
+            <h4 class="m-0"><?= $pageTitle ?></h4>
+            <a href="<?= $backUrl ?>" class="btn-back">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
@@ -262,6 +274,12 @@
 
         <div class="card card-box">
             <div class="card-body p-4">
+
+                <?php if ($isEdit && !empty($ticket['review_note'])) : ?>
+                    <div class="prev-reason">
+                        <strong>سبب عدم الاعتماد السابق:</strong> <?= esc($ticket['review_note']) ?>
+                    </div>
+                <?php endif; ?>
 
                 <?php if (session()->getFlashdata('errors')) : ?>
                     <div class="alert alert-danger">
@@ -273,26 +291,26 @@
                     </div>
                 <?php endif; ?>
 
-                <form method="post" action="<?= site_url('tickets/store') ?>">
+                <form method="post" action="<?= $formAction ?>">
                     <?= csrf_field() ?>
 
                     <div class="mb-3">
                         <label class="form-label">عنوان البلاغ</label>
                         <input type="text" name="title" class="form-control"
-                               placeholder="مثال: الطابعة لا تعمل" value="<?= esc(old('title')) ?>" required>
+                               placeholder="مثال: الطابعة لا تعمل" value="<?= esc($titleValue) ?>" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">القسم</label>
                         <div class="custom-dropdown">
-                            <input type="hidden" name="category" value="<?= $currentCategory ?>">
+                            <input type="hidden" name="category" value="<?= esc($currentCategory) ?>">
                             <div class="custom-dropdown-selected" onclick="toggleDropdown(this)">
                                 <span><?= esc($categories[$currentCategory]) ?></span>
                             </div>
                             <div class="custom-dropdown-options">
                                 <?php foreach ($categories as $value => $label) : ?>
                                     <div class="custom-dropdown-option <?= $value === $currentCategory ? 'selected' : '' ?>"
-                                         data-value="<?= $value ?>" onclick="selectOption(this)"><?= esc($label) ?></div>
+                                         data-value="<?= esc($value) ?>" onclick="selectOption(this)"><?= esc($label) ?></div>
                                 <?php endforeach; ?>
                             </div>
                         </div>
@@ -301,26 +319,26 @@
                     <div class="mb-3">
                         <label class="form-label">تفاصيل المشكلة</label>
                         <textarea name="description" class="form-control" rows="5"
-                                  placeholder="اشرحي المشكلة بالتفصيل..." required><?= esc(old('description')) ?></textarea>
+                                  placeholder="اشرحي المشكلة بالتفصيل..." required><?= esc($descValue) ?></textarea>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label">الأولوية</label>
                         <div class="custom-dropdown">
-                            <input type="hidden" name="priority" value="<?= $currentPriority ?>">
+                            <input type="hidden" name="priority" value="<?= esc($currentPriority) ?>">
                             <div class="custom-dropdown-selected" onclick="toggleDropdown(this)">
                                 <span><?= esc($priorities[$currentPriority]) ?></span>
                             </div>
                             <div class="custom-dropdown-options">
                                 <?php foreach ($priorities as $value => $label) : ?>
                                     <div class="custom-dropdown-option <?= $value === $currentPriority ? 'selected' : '' ?>"
-                                         data-value="<?= $value ?>" onclick="selectOption(this)"><?= esc($label) ?></div>
+                                         data-value="<?= esc($value) ?>" onclick="selectOption(this)"><?= esc($label) ?></div>
                                 <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-save w-100">إرسال البلاغ</button>
+                    <button type="submit" class="btn-save w-100"><?= $submitText ?></button>
                 </form>
 
             </div>

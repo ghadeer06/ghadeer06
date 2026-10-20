@@ -21,7 +21,6 @@
             --bg-light: #F6F4F0;
         }
 
-        /* الفوتر الثابت: الصفحة كلها عمود بارتفاع الشاشة، والمحتوى يتمدد */
         html, body { height: 100%; }
 
         body {
@@ -32,10 +31,7 @@
             flex-direction: column;
         }
 
-        .page-content {
-            flex: 1 0 auto;
-            padding-bottom: 2rem;
-        }
+        .page-content { flex: 1 0 auto; padding-bottom: 2rem; }
 
         .site-footer {
             flex-shrink: 0;
@@ -46,6 +42,7 @@
             padding: 1rem 0;
         }
 
+        /* ===== النافبار ===== */
         .navbar {
             background: var(--dark-green) !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
@@ -54,11 +51,33 @@
             align-items: center;
             justify-content: space-between;
         }
-
         .navbar-brand { color: var(--gold) !important; font-weight: 700; }
         .navbar span, .navbar strong { color: #ffffff !important; }
 
+        .navbar .btn-outline-secondary {
+            color: #F6F4F0;
+            background: transparent;
+            border: 1.5px solid rgba(246,244,240,0.55);
+            font-weight: 600;
+        }
+        .navbar .btn-outline-secondary:hover {
+            background: #F6F4F0;
+            border-color: #F6F4F0;
+            color: #02807A;
+        }
+        .navbar .btn-outline-danger {
+            color: #02807A;
+            background: #F6F4F0;
+            border: 1.5px solid #F6F4F0;
+            font-weight: 600;
+        }
+        .navbar .btn-outline-danger:hover {
+            background: #ECE6DE;
+            border-color: #ECE6DE;
+            color: #02807A;
+        }
 
+        /* ===== البطاقات والجدول ===== */
         .card-box {
             border-radius: 12px;
             border: none;
@@ -69,7 +88,43 @@
         h4 { color: var(--dark-green); font-weight: 700; }
         table th { color: var(--dark-green); font-weight: 700; border-bottom: 2px solid var(--gold); }
 
+        .btn-outline-primary {
+            color: #02807A;
+            background: transparent;
+            border-color: #02807A;
+        }
+        .btn-outline-primary:hover {
+            background: #02807A;
+            border-color: #02807A;
+            color: #fff;
+        }
+        .card-box .btn-outline-danger {
+            color: #B4513F;
+            background: transparent;
+            border-color: #B4513F;
+        }
+        .card-box .btn-outline-danger:hover {
+            background: #B4513F;
+            border-color: #B4513F;
+            color: #fff;
+        }
+
+        /* ===== الشارات ===== */
+        .badge { font-weight: 600; padding: 0.45em 0.85em; border-radius: 20px; }
+
+        .badge-dept { background: #E3F1F0; color: #02807A; border: 1px solid #9CCFCC; }
+
+        .badge-priority-low    { background: #E6F3E3; color: #3C7A38; border: 1px solid #9FD297; }
+        .badge-priority-medium { background: #F6EBD6; color: #8A6420; border: 1px solid #D9BE86; }
+        .badge-priority-high   { background: #F8E0DA; color: #A33B2A; border: 1px solid #E3A99D; }
+
+        .badge-status-open        { background: #AA926D; color: #fff; }
+        .badge-status-in_progress { background: #309C99; color: #fff; }
+        .badge-status-resolved    { background: #5E9E5A; color: #fff; }
+
+        /* ===== مربعات الحالة (روابط تفعّل الفلتر وتلغيه) ===== */
         .stat-mini {
+            display: block;
             border-radius: 12px;
             border-top: 4px solid var(--gold);
             box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -77,6 +132,7 @@
             padding: 1.2rem;
             text-align: center;
             cursor: pointer;
+            text-decoration: none;
             transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
             user-select: none;
         }
@@ -92,17 +148,26 @@
         .stat-mini h3 { color: #000; font-weight: 800; margin-bottom: 0.2rem; }
         .stat-mini p { color: #7a8a86; margin: 0; font-size: 0.9rem; }
 
-        /* مربع البحث */
-        .search-wrapper {
-            position: relative;
-            width: 230px;
+        /* ===== الفلاتر ===== */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            background: #fff;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 1.2rem;
         }
+
+        .search-wrapper { position: relative; width: 240px; }
         .search-input {
             width: 100%;
             border: 1.5px solid var(--tan);
             border-radius: 8px;
-            padding: 6px 34px 6px 12px;
-            font-size: 0.85rem;
+            padding: 7px 34px 7px 12px;
+            font-size: 0.88rem;
             color: var(--dark-green);
             background-color: #fff;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -124,17 +189,59 @@
             display: flex;
         }
 
-        /* القائمة المخصصة */
-        .custom-dropdown {
-            position: relative;
-            width: 150px;
+        .btn-filter {
+            padding: 7px 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #02807A;
+            background: transparent;
+            border: 1.5px solid #02807A;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
         }
+        .btn-filter:hover { background: #02807A; color: #fff; }
+
+        .btn-clear {
+            padding: 7px 4px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #B4513F;
+            text-decoration: none;
+        }
+        .btn-clear:hover { text-decoration: underline; color: #9A4333; }
+
+        .btn-export {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #fff;
+            background: #02807A;
+            border: 1.5px solid #02807A;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        }
+        .btn-export:hover {
+            background: #026B66;
+            border-color: #026B66;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(2,128,122,0.25);
+        }
+
+        /* ===== القائمة المخصصة ===== */
+        .custom-dropdown { position: relative; width: 170px; }
 
         .custom-dropdown-selected {
             border: 1.5px solid var(--tan);
             border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 0.85rem;
+            padding: 7px 12px;
+            font-size: 0.88rem;
             color: var(--dark-green);
             background-color: #fff;
             cursor: pointer;
@@ -143,24 +250,18 @@
             align-items: center;
             transition: border-color 0.2s ease;
         }
-
         .custom-dropdown-selected:hover { border-color: var(--gold); }
-
         .custom-dropdown.active .custom-dropdown-selected {
             border-color: var(--gold);
             box-shadow: 0 0 0 0.2rem rgba(170,146,109,0.2);
         }
-
         .custom-dropdown-selected::after {
             content: "▾";
             color: var(--gold);
             margin-right: 5px;
             transition: transform 0.2s ease;
         }
-
-        .custom-dropdown.active .custom-dropdown-selected::after {
-            transform: rotate(180deg);
-        }
+        .custom-dropdown.active .custom-dropdown-selected::after { transform: rotate(180deg); }
 
         .custom-dropdown-options {
             display: none;
@@ -175,133 +276,77 @@
             overflow: hidden;
             z-index: 10;
         }
-
         .custom-dropdown.active .custom-dropdown-options { display: block; }
 
         .custom-dropdown-option {
             padding: 8px 12px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             color: var(--dark-green);
             transition: background 0.15s ease;
         }
-
         .custom-dropdown-option:hover { background: var(--cream); }
-
         .custom-dropdown-option.selected {
             background: var(--gold);
             color: #fff;
             font-weight: 600;
         }
 
-        /* ===== أزرار النافبار ===== */
-.navbar .btn-outline-secondary {
-    color: #F6F4F0;
-    background: transparent;
-    border: 1.5px solid rgba(246,244,240,0.55);
-    font-weight: 600;
-}
-.navbar .btn-outline-secondary:hover {
-    background: #F6F4F0;
-    border-color: #F6F4F0;
-    color: #02807A;
-}
-
-.navbar .btn-outline-danger {
-    color: #02807A;
-    background: #F6F4F0;
-    border: 1.5px solid #F6F4F0;
-    font-weight: 600;
-}
-.navbar .btn-outline-danger:hover {
-    background: #ECE6DE;
-    border-color: #ECE6DE;
-    color: #02807A;
-}
-
-/* ===== أزرار الجدول والنماذج ===== */
-.btn-outline-primary {
-    color: #02807A;
-    background: transparent;
-    border-color: #02807A;
-}
-.btn-outline-primary:hover {
-    background: #02807A;
-    border-color: #02807A;
-    color: #fff;
-}
-
-.btn-outline-danger {
-    color: #B4513F;
-    background: transparent;
-    border-color: #B4513F;
-}
-.btn-outline-danger:hover {
-    background: #B4513F;
-    border-color: #B4513F;
-    color: #fff;
-}
-
-.btn-danger {
-    background: #B4513F;
-    border-color: #B4513F;
-    color: #fff;
-}
-.btn-danger:hover {
-    background: #9A4333;
-    border-color: #9A4333;
-    color: #fff;
-}
-
-/* ===== الشارات ===== */
-.badge {
-    font-weight: 600;
-    padding: 0.45em 0.85em;
-    border-radius: 20px;
-}
-
-/* الأولوية (ألوان ناعمة بحدود) */
-.badge-priority-low    { background: #E6F3E3; color: #3C7A38; border: 1px solid #9FD297; }
-.badge-priority-medium { background: #F6EBD6; color: #8A6420; border: 1px solid #D9BE86; }
-.badge-priority-high   { background: #F8E0DA; color: #A33B2A; border: 1px solid #E3A99D; }
-
-/* الحالة (ألوان ممتلئة) */
-.badge-status-open        { background: #AA926D; color: #fff; }
-.badge-status-in_progress { background: #309C99; color: #fff; }
-.badge-status-resolved    { background: #5E9E5A; color: #fff; }
-    
-    /* ===== زر تصدير إكسل ===== */
-.btn-export {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 6px 14px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #fff;
-    background: #02807A;
-    border: 1.5px solid #02807A;
-    border-radius: 8px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-}
-
-.btn-export:hover {
-    background: #026B66;
-    border-color: #026B66;
-    color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(2,128,122,0.25);
-}
-
-.btn-export:active {
-    transform: translateY(0);
-    box-shadow: none;
-}
-</style>
+        /* ===== تقسيم الصفحات ===== */
+        .pagination .page-link { color: #02807A; border-color: var(--tan); }
+        .pagination .page-link:hover { background: var(--beige); color: #02807A; }
+        .pagination .page-item.active .page-link {
+            background: #02807A;
+            border-color: #02807A;
+            color: #fff;
+        }
+        .list-footer { color: #7a7367; font-size: 0.88rem; }
+    </style>
 </head>
 <body>
+
+    <?php
+        $departments = \App\Models\TicketModel::DEPARTMENTS;
+        $priorities  = \App\Models\TicketModel::PRIORITIES;
+        $statuses    = \App\Models\TicketModel::STATUSES;
+
+        $hasFilters = $filters['q'] !== '' || $filters['dept'] !== ''
+                   || $filters['priority'] !== '' || $filters['status'] !== '';
+
+        // رابط الصفحة مع الفلاتر الحالية (مع إمكانية تغيير قيمة معيّنة)
+        $buildUrl = static function (string $path, array $filters, array $override = []): string {
+            $params = array_merge(array_filter($filters, static fn($v) => $v !== ''), $override);
+            $params = array_filter($params, static fn($v) => $v !== '' && $v !== null);
+
+            return site_url($path) . ($params ? '?' . http_build_query($params) : '');
+        };
+
+        $exportUrl = $buildUrl('admin/tickets/export', $filters);
+
+        // قائمة منسدلة تعيد إرسال نموذج الفلاتر عند الاختيار
+        $renderDropdown = static function (string $name, array $options, string $current, string $allLabel): string {
+            $label = ($current !== '' && isset($options[$current])) ? $options[$current] : $allLabel;
+
+            $html  = '<div class="custom-dropdown">';
+            $html .= '<input type="hidden" name="' . esc($name, 'attr') . '" value="' . esc($current, 'attr') . '">';
+            $html .= '<div class="custom-dropdown-selected" onclick="toggleDropdown(this)"><span>' . esc($label) . '</span></div>';
+            $html .= '<div class="custom-dropdown-options">';
+            $html .= '<div class="custom-dropdown-option ' . ($current === '' ? 'selected' : '') . '" data-value="" onclick="pickFilter(this)">' . esc($allLabel) . '</div>';
+
+            foreach ($options as $value => $text) {
+                $selected = ($current === (string) $value) ? 'selected' : '';
+                $html .= '<div class="custom-dropdown-option ' . $selected . '" data-value="' . esc((string) $value, 'attr') . '" onclick="pickFilter(this)">' . esc($text) . '</div>';
+            }
+
+            return $html . '</div></div>';
+        };
+
+        $statBoxes = [
+            'open'        => 'بلاغات جديدة',
+            'in_progress' => 'قيد المعالجة',
+            'resolved'    => 'تم الحل',
+        ];
+    ?>
 
     <nav class="navbar navbar-expand-lg px-4 mb-4">
         <span>مرحبًا، <strong><?= esc(session()->get('name')) ?></strong></span>
@@ -316,81 +361,64 @@
     <div class="container page-content">
 
         <?php if (session()->getFlashdata('success')) : ?>
-            <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+            <div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div>
         <?php endif; ?>
 
-        <?php
-            $openCount = 0;
-            $progressCount = 0;
-            $resolvedCount = 0;
-
-            foreach ($tickets as $t) {
-                if ($t['status'] === 'open') {
-                    $openCount++;
-                } elseif ($t['status'] === 'in_progress') {
-                    $progressCount++;
-                } elseif ($t['status'] === 'resolved') {
-                    $resolvedCount++;
-                }
-            }
-        ?>
+        <?php if (session()->getFlashdata('error')) : ?>
+            <div class="alert alert-danger"><?= esc(session()->getFlashdata('error')) ?></div>
+        <?php endif; ?>
 
         <div class="row g-3 mb-4">
-            <div class="col-md-4 col-4">
-                <div class="stat-mini" data-status="open" onclick="filterTickets('open')">
-                    <h3><?= $openCount ?></h3><p>بلاغات جديدة</p>
+            <?php foreach ($statBoxes as $key => $label) : ?>
+                <?php
+                    $isActive = $filters['status'] === $key;
+                    // ضغطة تفعّل الفلتر، وضغطة ثانية على نفس المربع تلغيه
+                    $boxUrl = $buildUrl('admin/tickets', $filters, ['status' => $isActive ? '' : $key]);
+                ?>
+                <div class="col-md-4 col-4">
+                    <a href="<?= $boxUrl ?>" class="stat-mini <?= $isActive ? 'active' : '' ?>">
+                        <h3><?= $counts[$key] ?></h3><p><?= $label ?></p>
+                    </a>
                 </div>
-            </div>
-            <div class="col-md-4 col-4">
-                <div class="stat-mini" data-status="in_progress" onclick="filterTickets('in_progress')">
-                    <h3><?= $progressCount ?></h3><p>قيد المعالجة</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-4">
-                <div class="stat-mini" data-status="resolved" onclick="filterTickets('resolved')">
-                    <h3><?= $resolvedCount ?></h3><p>تم الحل</p>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
             <h4 class="m-0">جميع البلاغات</h4>
-            <div class="d-flex gap-2 flex-wrap align-items-start">
 
-                <div class="search-wrapper">
-                    <span class="search-icon">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="7"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                    </span>
-                    <input type="text" id="searchBox" class="search-input"
-                           placeholder="ابحث بالعنوان أو الموظف..." onkeyup="searchTickets()">
-                </div>
-
-                <div class="custom-dropdown" id="priorityDropdown">
-                    <input type="hidden" id="priorityFilter" value="all">
-                    <div class="custom-dropdown-selected" onclick="toggleDropdown('priorityDropdown')">
-                        <span id="prioritySelectedText">جميع الأولويات</span>
-                    </div>
-                    <div class="custom-dropdown-options">
-                        <div class="custom-dropdown-option selected" data-value="all" onclick="selectPriority('all', 'جميع الأولويات')">جميع الأولويات</div>
-                        <div class="custom-dropdown-option" data-value="high" onclick="selectPriority('high', 'عالية')">عالية</div>
-                        <div class="custom-dropdown-option" data-value="medium" onclick="selectPriority('medium', 'متوسطة')">متوسطة</div>
-                        <div class="custom-dropdown-option" data-value="low" onclick="selectPriority('low', 'منخفضة')">منخفضة</div>
-                    </div>
-                </div>
-
-                <a href="<?= site_url('admin/tickets/export') ?>" class="btn-export">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-    </svg>
-    تصدير إلى إكسل
-</a>
-            </div>
+            <a href="<?= $exportUrl ?>" class="btn-export">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                تصدير إلى إكسل
+            </a>
         </div>
+
+        <form method="get" action="<?= site_url('admin/tickets') ?>" id="filterForm" class="filter-bar">
+            <input type="hidden" name="status" value="<?= esc($filters['status'], 'attr') ?>">
+
+            <div class="search-wrapper">
+                <span class="search-icon">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
+                <input type="text" name="q" class="search-input" value="<?= esc($filters['q'], 'attr') ?>"
+                       placeholder="ابحث بالعنوان أو الموظف أو التفاصيل...">
+            </div>
+
+            <?= $renderDropdown('dept', $departments, $filters['dept'], 'جميع الأقسام') ?>
+            <?= $renderDropdown('priority', $priorities, $filters['priority'], 'جميع الأولويات') ?>
+
+            <button type="submit" class="btn-filter">بحث</button>
+
+            <?php if ($hasFilters) : ?>
+                <a href="<?= site_url('admin/tickets') ?>" class="btn-clear">مسح الفلاتر</a>
+            <?php endif; ?>
+        </form>
 
         <div class="card card-box">
             <div class="card-body">
@@ -400,7 +428,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>العنوان</th>
-                                <th>النوع</th>
+                                <th>القسم</th>
                                 <th>الموظف</th>
                                 <th>الأولوية</th>
                                 <th>الحالة</th>
@@ -411,35 +439,31 @@
                         <tbody>
                             <?php if (empty($tickets)) : ?>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">لا توجد بلاغات حتى الآن</td>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        <?= $hasFilters ? 'لا توجد بلاغات مطابقة' : 'لا توجد بلاغات معتمدة حتى الآن' ?>
+                                    </td>
                                 </tr>
                             <?php else : ?>
                                 <?php foreach ($tickets as $ticket) : ?>
-                                    <tr class="ticket-row" data-status="<?= $ticket['status'] ?>" data-priority="<?= $ticket['priority'] ?>">
+                                    <tr>
                                         <td>#<?= $ticket['id'] ?></td>
                                         <td><?= esc($ticket['title']) ?></td>
                                         <td>
-                                            <?php
-                                                $categoryLabels = [
-                                                    'network' => 'شبكة', 'web_page' => 'موقع', 'printer' => 'طابعة',
-                                                    'software' => 'برامج', 'hardware' => 'أجهزة', 'other' => 'أخرى',
-                                                ];
-                                                echo $categoryLabels[$ticket['category']] ?? 'أخرى';
-                                            ?>
+                                            <span class="badge badge-dept"><?= esc($departments[$ticket['category']] ?? 'أخرى') ?></span>
                                         </td>
                                         <td><?= esc($ticket['employee_name']) ?></td>
                                         <td>
                                             <span class="badge badge-priority-<?= $ticket['priority'] ?>">
-                                                <?= $ticket['priority'] === 'low' ? 'منخفضة' : ($ticket['priority'] === 'medium' ? 'متوسطة' : 'عالية') ?>
+                                                <?= esc($priorities[$ticket['priority']] ?? $ticket['priority']) ?>
                                             </span>
                                         </td>
                                         <td>
                                             <span class="badge badge-status-<?= $ticket['status'] ?>">
-                                                <?= $ticket['status'] === 'open' ? 'جديد' : ($ticket['status'] === 'in_progress' ? 'قيد المعالجة' : 'تم الحل') ?>
+                                                <?= esc($statuses[$ticket['status']] ?? $ticket['status']) ?>
                                             </span>
                                         </td>
                                         <td><?= date('Y-m-d H:i', strtotime($ticket['created_at'])) ?></td>
-                                        <td>
+                                        <td class="text-nowrap">
                                             <a href="<?= site_url('admin/tickets/show/' . $ticket['id']) ?>"
                                                class="btn btn-sm btn-outline-primary">عرض</a>
                                             <a href="<?= site_url('admin/tickets/delete/' . $ticket['id']) ?>"
@@ -448,14 +472,17 @@
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
-
-                                <tr id="noResultsRow" style="display:none">
-                                    <td colspan="8" class="text-center text-muted py-4">لا توجد بلاغات مطابقة</td>
-                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
+
+                <?php if ($pager->getPageCount() > 1) : ?>
+                    <div class="d-flex flex-column align-items-center gap-2 mt-3">
+                        <?= $pager->links('default', 'custom_full') ?>
+                        <div class="list-footer">إجمالي النتائج: <?= $pager->getTotal() ?></div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -466,46 +493,8 @@
     </footer>
 
     <script>
-        let currentStatusFilter = 'all';
-
-        function filterTickets(status) {
-            currentStatusFilter = (currentStatusFilter === status) ? 'all' : status;
-
-            document.querySelectorAll('.stat-mini').forEach(box => {
-                box.classList.toggle('active', box.dataset.status === currentStatusFilter);
-            });
-
-            applyFilters();
-        }
-
-        function searchTickets() {
-            applyFilters();
-        }
-
-        function applyFilters() {
-            const searchText = document.getElementById('searchBox').value.trim().toLowerCase();
-            const priorityValue = document.getElementById('priorityFilter').value;
-            const rows = document.querySelectorAll('.ticket-row');
-            let visibleCount = 0;
-
-            rows.forEach(row => {
-                const matchesStatus = currentStatusFilter === 'all' || row.dataset.status === currentStatusFilter;
-                const matchesPriority = priorityValue === 'all' || row.dataset.priority === priorityValue;
-                const matchesSearch = searchText === '' || row.innerText.toLowerCase().includes(searchText);
-
-                const show = matchesStatus && matchesPriority && matchesSearch;
-                row.style.display = show ? '' : 'none';
-                if (show) visibleCount++;
-            });
-
-            const noResults = document.getElementById('noResultsRow');
-            if (noResults) {
-                noResults.style.display = (rows.length > 0 && visibleCount === 0) ? '' : 'none';
-            }
-        }
-
-        function toggleDropdown(id) {
-            const dropdown = document.getElementById(id);
+        function toggleDropdown(selectedEl) {
+            const dropdown = selectedEl.closest('.custom-dropdown');
             const isActive = dropdown.classList.contains('active');
 
             document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active'));
@@ -515,16 +504,11 @@
             }
         }
 
-        function selectPriority(value, label) {
-            document.getElementById('priorityFilter').value = value;
-            document.getElementById('prioritySelectedText').textContent = label;
-
-            document.querySelectorAll('#priorityDropdown .custom-dropdown-option').forEach(opt => {
-                opt.classList.toggle('selected', opt.dataset.value === value);
-            });
-
-            document.getElementById('priorityDropdown').classList.remove('active');
-            applyFilters();
+        // اختيار قيمة من قائمة الفلتر ثم إعادة إرسال النموذج
+        function pickFilter(optionEl) {
+            const dropdown = optionEl.closest('.custom-dropdown');
+            dropdown.querySelector('input[type="hidden"]').value = optionEl.dataset.value;
+            document.getElementById('filterForm').submit();
         }
 
         document.addEventListener('click', function(e) {
